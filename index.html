@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>我的云端动态歌词播放器</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; background: #121212; color: #fff; padding-top: 50px; }
+        #lyrics { height: 300px; overflow-y: auto; margin: 20px auto; width: 60%; mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent); }
+        .line { color: #888; margin: 10px 0; transition: 0.3s; }
+        .line.active { color: #1ed760; font-size: 1.2em; font-weight: bold; }
+        audio { width: 60%; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <h2>🎵 个人云端动态歌词</h2>
+    
+    <!-- 替换下方的链接为你的 Google Drive 音频直链 -->
+    <audio id="audioPlayer" controls src="https://docs.google.com/uc?export=download&id=你的音频文件ID"></audio>
+    
+    <div id="lyrics">载入歌词中...</div>
+
+    <script>
+        const audio = document.getElementById('audioPlayer');
+        const lyricsContainer = document.getElementById('lyrics');
+        let lrcData = [];
+
+        // 替换下方的链接为你的 Google Drive 歌词文件直链
+        fetch('https://docs.google.com/uc?export=download&id=你的歌词文件ID')
+            .then(response => response.text())
+            .then(text => {
+                lrcData = parseLRC(text);
+                renderLyrics();
+            });
+
+        // 解析 LRC 歌词
+        function parseLRC(lrcText) {
+            const lines = lrcText.split('\n');
+            const result = [];
+            const timeReg = /\[(\d{2}):(\d{2})\.(\d{2,3})\]/;
+            
+            lines.forEach(line => {
+                const match = timeReg.exec(line);
+                if (match) {
+                    const minutes = parseInt(match[1]);
+                    const seconds = parseInt(match[2]);
+                    const milliseconds = parseInt(match[3].length === 2 ? match[3] * 10 : match[3]);
+                    const time = minutes * 60 + seconds + milliseconds / 1000;
+                    const text = line.replace(timeReg, '').trim();
+                    if (text) result.push({ time, text });
+                }
+            });
+            return result;
+        }
+
+        // 渲染歌词 DOM
+        function renderLyrics() {
+            lyricsContainer.innerHTML = lrcData.map((item, index) => 
+                `<div class="line" id="line-${index}">${item.text}</div>`
+            ).join('');
+        }
+
+        // 监听播放进度同步歌词
+        audio.addEventListener('timeupdate', () => {
+            const currentTime = audio.currentTime;
+            for (let i = 0; i < lrcData.length; i++) {
+                if (i === lrcData.length - 1 || (currentTime >= lrcData[i].time && currentTime < lrcData[i+1].time)) {
+                    updateActiveLine(i);
+                    break;
+                }
+            }
+        });
+
+        function updateActiveLine(index) {
+            document.querySelectorAll('.line').forEach(el => el.classList.remove('active'));
+            const activeEl = document.getElementById(`line-${index}`);
+            if (activeEl) {
+                activeEl.classList.add('active');
+                activeEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    </script>
+</body>
+</html>
