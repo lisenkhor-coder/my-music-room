@@ -15,7 +15,7 @@
 
     <h2>🎵 个人云端动态歌词</h2>
     
-    <!-- 替换下方的链接为你的 Google Drive 音频直链 -->
+    <!-- 音频直链 -->
     <audio id="audioPlayer" controls src="https://docs.google.com/uc?export=download&id=1Oi38DNYDF2XBwrM66vkFkASZpZkdqGOn"></audio>
     
     <div id="lyrics">载入歌词中...</div>
@@ -25,12 +25,26 @@
         const lyricsContainer = document.getElementById('lyrics');
         let lrcData = [];
 
-        // 替换下方的链接为你的 Google Drive 歌词文件直链
-        fetch('https://docs.google.com/uc?export=download&id=13atBRHRZ94LVe6vePTHlpzuqchTM2kb9')
-            .then(response => response.text())
+        // 使用 CORS 代理 (AllOrigins) 绕过跨域限制抓取 Google Drive 歌词
+        const lrcUrl = 'https://docs.google.com/uc?export=download&id=13atBRHRZ94LVe6vePTHlpzuqchTM2kb9';
+        const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(lrcUrl);
+
+        fetch(proxyUrl)
+            .then(response => {
+                if (!response.ok) throw new Error('网络请求失败');
+                return response.text();
+            })
             .then(text => {
                 lrcData = parseLRC(text);
-                renderLyrics();
+                if (lrcData.length > 0) {
+                    renderLyrics();
+                } else {
+                    lyricsContainer.innerHTML = '歌词格式错误或为空';
+                }
+            })
+            .catch(error => {
+                console.error('加载歌词出错:', error);
+                lyricsContainer.innerHTML = '歌词加载失败，请检查 Google Drive 权限或链接';
             });
 
         // 解析 LRC 歌词
@@ -50,6 +64,8 @@
                     if (text) result.push({ time, text });
                 }
             });
+            // 按时间排序
+            result.sort((a, b) => a.time - b.time);
             return result;
         }
 
