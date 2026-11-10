@@ -15,7 +15,7 @@
 
     <h2>🎵 个人云端动态歌词</h2>
     
-    <!-- 音频直链（直接使用 Google Drive 链接） -->
+    <!-- 音频继续使用你的 Google Drive 直链 -->
     <audio id="audioPlayer" controls src="https://docs.google.com/uc?export=download&id=1Oi38DNYDF2XBwrM66vkFkASZpZkdqGOn"></audio>
     
     <div id="lyrics">载入歌词中...</div>
@@ -25,11 +25,10 @@
         const lyricsContainer = document.getElementById('lyrics');
         let lrcData = [];
 
-        // 核心：使用 API 代理来绕过 Google Drive 的歌词跨域拦截
-        const lrcUrl = 'https://docs.google.com/uc?export=download&id=13atBRHRZ94LVe6vePTHlpzuqchTM2kb9';
-        const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(lrcUrl);
+        // 直接读取你上传到 GitHub 仓库的歌词直链（已包含中文编码）
+        const lrcUrl = 'https://raw.githubusercontent.com/lisenkhor-coder/my-music-room/main/%E9%82%A3%E5%A4%A9%E4%B8%8B%E9%9B%A8%E4%BA%86.lrc';
 
-        fetch(proxyUrl)
+        fetch(lrcUrl)
             .then(response => {
                 if (!response.ok) throw new Error('网络请求失败');
                 return response.text();
@@ -44,7 +43,7 @@
             })
             .catch(error => {
                 console.error('加载歌词出错:', error);
-                lyricsContainer.innerHTML = '歌词加载失败，请检查 Google Drive 权限';
+                lyricsContainer.innerHTML = '歌词加载失败';
             });
 
         // 解析 LRC 歌词
