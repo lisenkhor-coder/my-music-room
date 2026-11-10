@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <title>我的云端动态歌词播放器</title>
+    <title>我的 Google Drive 云端音乐播放器</title>
     <style>
         body { font-family: sans-serif; text-align: center; background: #121212; color: #fff; padding-top: 50px; }
         #lyrics { height: 300px; overflow-y: auto; margin: 20px auto; width: 60%; mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent); }
@@ -13,10 +13,10 @@
 </head>
 <body>
 
-    <h2>🎵 个人云端动态歌词</h2>
+    <h2>🎵 Google Drive 云端动态歌词播放器</h2>
     
-    <!-- 音频继续使用你的 Google Drive 直链 -->
-    <audio id="audioPlayer" controls src="https://raw.githubusercontent.com/lisenkhor-coder/my-music-room/main/%E5%91%A8%E6%9D%B0%E4%BC%A6-%E9%82%A3%E5%A4%A9%E4%B8%8B%E9%9B%A8%E4%BA%86.mp3"></audio>
+    <!-- 音频播放器：使用 Google Drive 的嵌入式直链 -->
+    <audio id="audioPlayer" controls src="https://docs.google.com/uc?export=open&id=1Oi38DNYDF2XBwrM66vkFkASZpZkdqGOn"></audio>
     
     <div id="lyrics">载入歌词中...</div>
 
@@ -25,10 +25,15 @@
         const lyricsContainer = document.getElementById('lyrics');
         let lrcData = [];
 
-        // 直接读取你上传到 GitHub 仓库的歌词直链（已包含中文编码）
-        const lrcUrl = 'https://raw.githubusercontent.com/lisenkhor-coder/my-music-room/main/%E9%82%A3%E5%A4%A9%E4%B8%8B%E9%9B%A8%E4%BA%86.lrc';
+        // 歌词链接：使用 Google Drive 专属代理或直接读取
+        const lrcFileId = '你的歌词文件ID'; // 如果歌词也在网盘，填这里；如果刚才 GitHub 的歌词有效，也可以用网盘链接
+        const lrcUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://docs.google.com/uc?export=download&id=' + lrcFileId);
 
-        fetch(lrcUrl)
+        // 如果你希望歌词也完全走 Google Drive，可以用上面这行；
+        // 如果歌词暂时用回你刚才成功的 GitHub 歌词直链，也可以直接把下面这行换成你的 GitHub 歌词 raw 链接：
+        const githubLrcUrl = 'https://raw.githubusercontent.com/lisenkhor-coder/my-music-room/main/%E9%82%A3%E5%A4%A9%E4%B8%8B%E9%9B%A8%E4%BA%86.lrc';
+
+        fetch(githubLrcUrl)
             .then(response => {
                 if (!response.ok) throw new Error('网络请求失败');
                 return response.text();
