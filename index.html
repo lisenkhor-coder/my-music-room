@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <title>我的 Google Drive 云端音乐播放器</title>
+    <title>我的云端动态歌词播放器</title>
     <style>
         body { font-family: sans-serif; text-align: center; background: #121212; color: #fff; padding-top: 50px; }
         #lyrics { height: 300px; overflow-y: auto; margin: 20px auto; width: 60%; mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent); }
@@ -13,11 +13,10 @@
 </head>
 <body>
 
-    <h2>🎵 Google Drive 云端动态歌词播放器</h2>
+    <h2>🎵 个人云端动态歌词</h2>
     
-    <!-- 音频播放器：使用 Google Drive 的嵌入式直链 -->
-    <!-- 使用 Google Drive 的稳定直链转换代理 -->
-<audio id="audioPlayer" controls src="https://gdrive-proxy.lisenkhor.workers.dev/?id=1Oi38DNYDF2XBwrM66vkFkASZpZkdqGOn"></audio>
+    <!-- 替换下方的链接为你的 Google Drive 音频直链 -->
+    <audio id="audioPlayer" controls src="https://docs.google.com/uc?export=download&id=1Oi38DNYDF2XBwrM66vkFkASZpZkdqGOn"></audio>
     
     <div id="lyrics">载入歌词中...</div>
 
@@ -26,30 +25,12 @@
         const lyricsContainer = document.getElementById('lyrics');
         let lrcData = [];
 
-        // 歌词链接：使用 Google Drive 专属代理或直接读取
-        const lrcFileId = '你的歌词文件ID'; // 如果歌词也在网盘，填这里；如果刚才 GitHub 的歌词有效，也可以用网盘链接
-        const lrcUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://docs.google.com/uc?export=download&id=' + lrcFileId);
-
-        // 如果你希望歌词也完全走 Google Drive，可以用上面这行；
-        // 如果歌词暂时用回你刚才成功的 GitHub 歌词直链，也可以直接把下面这行换成你的 GitHub 歌词 raw 链接：
-        const githubLrcUrl = 'https://raw.githubusercontent.com/lisenkhor-coder/my-music-room/main/%E9%82%A3%E5%A4%A9%E4%B8%8B%E9%9B%A8%E4%BA%86.lrc';
-
-        fetch(githubLrcUrl)
-            .then(response => {
-                if (!response.ok) throw new Error('网络请求失败');
-                return response.text();
-            })
+        // 替换下方的链接为你的 Google Drive 歌词文件直链
+        fetch('https://docs.google.com/uc?export=download&id=13atBRHRZ94LVe6vePTHlpzuqchTM2kb9')
+            .then(response => response.text())
             .then(text => {
                 lrcData = parseLRC(text);
-                if (lrcData.length > 0) {
-                    renderLyrics();
-                } else {
-                    lyricsContainer.innerHTML = '歌词格式错误或为空';
-                }
-            })
-            .catch(error => {
-                console.error('加载歌词出错:', error);
-                lyricsContainer.innerHTML = '歌词加载失败';
+                renderLyrics();
             });
 
         // 解析 LRC 歌词
@@ -69,7 +50,6 @@
                     if (text) result.push({ time, text });
                 }
             });
-            result.sort((a, b) => a.time - b.time);
             return result;
         }
 
